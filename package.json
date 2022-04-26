@@ -1,0 +1,11 @@
+{
+  "name": "quake-log-parser",
+  "version": "1.0.0",
+  "description": "Quake 3 log parser - Engineering test for Cloudwalk",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/parser.js"
+  },
+  "author": "Filipe Abreu",
+  "license": "MIT"
+}
