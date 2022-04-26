@@ -1,4 +1,11 @@
 const fs = require('fs');
+
+class Game {
+  constructor(data) {
+    this.data = data;
+  }
+}
+
 class LogParser {
   constructor(logfile) {
     try {
