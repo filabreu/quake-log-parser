@@ -4,6 +4,26 @@ class Game {
   constructor(data) {
     this.data = data;
   }
+
+  get name() {
+    return;
+  }
+
+  get totalKills() {
+    return;
+  }
+
+  get players() {
+    return;
+  }
+
+  get kills() {
+    return;
+  }
+
+  get killsByMeans() {
+    return;
+  }
 }
 
 class LogParser {
