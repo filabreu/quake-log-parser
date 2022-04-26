@@ -1,13 +1,20 @@
 const fs = require('fs');
-
-fs.readFile('./logs/qgames.log', 'utf8', (err, data) => {
-  if (err) {
-    console.error(err);
-
-    return;
+class LogParser {
+  constructor(logfile) {
+    try {
+      this.data = fs.readFileSync(logfile, "utf8");
+    } catch (err) {
+      console.error(err);
+    };
   }
 
-  const gameInfo = {};
+  parse() {
+    return this.data;
+  }
+}
 
-  console.log(data);
-});
+const parser = new LogParser("./logs/qgames.log");
+
+const parsedData = parser.parse();
+
+console.log(parsedData);
