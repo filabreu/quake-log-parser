@@ -68,15 +68,10 @@ class LogParser {
     }
 
     this.games = [];
-    this.currentGame;
   }
 
   static initGame(_data, parser) {
-    if (parser.currentGame) {
-      parser.games.push(parser.currentGame);
-    }
-
-    parser.currentGame = new Game(`game_${parser.games.length + 1}`);
+    parser.games.push(new Game(`game_${parser.games.length + 1}`));
   }
 
   static addPlayer(data, parser) {
@@ -144,6 +139,10 @@ class LogParser {
 
   get rows() {
     return this.data.split(/\n/);
+  }
+
+  get currentGame() {
+    return this.games.slice(-1)[0];
   }
 }
 
