@@ -1,12 +1,8 @@
 const fs = require('fs');
 
 class Game {
-  constructor(data) {
-    this.data = data;
-  }
-
-  get name() {
-    return;
+  constructor(name) {
+    this.name = name;
   }
 
   get totalKills() {
@@ -36,12 +32,34 @@ class LogParser {
   }
 
   parse() {
-    return this.data;
+    return this.games;
+  }
+
+  static gameInitMatch = /InitGame/;
+
+  get rows() {
+    return this.data.split(/\n/);
+  }
+
+  get games() {
+    const gamesArr = [];
+    let currentGame;
+
+    for (const [i, row] of this.rows.entries()) {
+      if (row.match(LogParser.gameInitMatch)) {
+        if (currentGame) {
+          gamesArr.push(currentGame);
+        }
+        
+        currentGame = new Game(`game_${gamesArr.length+1}`);
+        continue;
+      }
+    }
+
+    return gamesArr;
   }
 }
 
-const parser = new LogParser("./logs/qgames.log");
-
-const parsedData = parser.parse();
+const parsedData = new LogParser("./logs/qgames.log").parse();
 
 console.log(parsedData);
