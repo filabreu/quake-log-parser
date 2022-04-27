@@ -3,6 +3,7 @@ const fs = require('fs');
 class Game {
   constructor(name) {
     this.name = name;
+    this.playerMap = {};
   }
 
   get totalKills() {
@@ -29,37 +30,67 @@ class LogParser {
     } catch (err) {
       console.error(err);
     };
+
+    this.games = [];
+    this.currentGame;
+  }
+
+  static initGame(_data, parser) {
+    if (parser.currentGame) {
+      parser.games.push(parser.currentGame);
+    }
+
+    parser.currentGame = new Game(`game_${parser.games.length + 1}`);
+  }
+
+  static addPlayer(data, parser) {
+    const dataMatch = data.match(/ClientConnect: (\d)/);
+    
+    if (dataMatch) {
+      const playerId = dataMatch[1];
+
+      parser.currentGame.playerMap[playerId] = '';
+    }
+  }
+
+  static changePlayer(data, parser) {
+    const dataMatch = data.match(/ClientUserinfoChanged: (\d) n\\(.*)\\t\\/);
+
+    if (dataMatch) {
+      const playerId = dataMatch[1];
+      const playerName = dataMatch[2];
+
+      parser.currentGame.playerMap[playerId] = playerName;
+    }
+  }
+
+  static gamePropertyHandlers = {
+    ['InitGame']: this.initGame,
+    ['ClientConnect']: this.addPlayer,
+    ['ClientUserinfoChanged']: this.changePlayer,
+  }
+
+  static gameParserHandlerMatcher(row, parser) {
+    for (const properyMatcher in this.gamePropertyHandlers) {
+      if (row.match(properyMatcher)) {
+        this.gamePropertyHandlers[properyMatcher](row, parser);
+        break;
+      }
+    }
   }
 
   parse() {
-    return this.games;
+    for (const [i, row] of this.rows.entries()) {
+      LogParser.gameParserHandlerMatcher(row, this);
+    }
   }
-
-  static gameInitMatch = /InitGame/;
 
   get rows() {
     return this.data.split(/\n/);
   }
-
-  get games() {
-    const gamesArr = [];
-    let currentGame;
-
-    for (const [i, row] of this.rows.entries()) {
-      if (row.match(LogParser.gameInitMatch)) {
-        if (currentGame) {
-          gamesArr.push(currentGame);
-        }
-        
-        currentGame = new Game(`game_${gamesArr.length+1}`);
-        continue;
-      }
-    }
-
-    return gamesArr;
-  }
 }
 
-const parsedData = new LogParser("./logs/qgames.log").parse();
+const parser = new LogParser("./logs/qgames.log");
+parser.parse();
 
-console.log(parsedData);
+console.log(parser.games)
