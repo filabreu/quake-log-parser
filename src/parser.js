@@ -43,19 +43,45 @@ class Game {
   ]
 
   get totalKills() {
-    return;
+    let killsCount = 0;
+
+    for (let playerId in this.killsMap) {
+      killsCount += this.killsMap[playerId];
+    }
+
+    return killsCount;
   }
 
   get players() {
-    return;
+    let playersNames = [];
+
+    for (let playerId in this.playerMap) {
+      playersNames.push(this.playerMap[playerId]);
+    }
+
+    return playersNames;
   }
 
   get kills() {
-    return;
+    let killsByPlayer = {};
+
+    for (let playerId in this.killsMap) {
+      killsByPlayer[this.playerMap[playerId]] = this.killsMap[playerId];
+    }
+
+    return killsByPlayer;
   }
 
   get killsByMeans() {
-    return;
+    let killsByMeansTitle = {};
+    
+    for (let killMeanId in this.killsMeansMap) {
+      if (this.killsMeansMap[killMeanId] > 0) {
+        killsByMeansTitle[Game.meansOfDeath[killMeanId]] = this.killsMeansMap[killMeanId];
+      }
+    };
+
+    return killsByMeansTitle;
   }
 }
 
@@ -134,7 +160,7 @@ class LogParser {
       LogParser.gameParserHandlerMatcher(row, this);
     }
 
-    console.log(this.games);
+    console.log(JSON.stringify(this.output, null, 2));
   }
 
   get rows() {
@@ -143,6 +169,21 @@ class LogParser {
 
   get currentGame() {
     return this.games.slice(-1)[0];
+  }
+
+  get output() {
+    const outputMap = {};
+
+    this.games.forEach((game) => {
+      outputMap[game.name] = {
+        total_kills: game.totalKills,
+        players: game.players,
+        kills: game.kills,
+        kills_by_means: game.killsByMeans
+      }
+    })
+
+    return outputMap;
   }
 }
 
