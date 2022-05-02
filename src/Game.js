@@ -4,6 +4,7 @@ class Game {
     this.playerMap = {};
     this.killsMap = {};
     this.killsMeansMap = {};
+    this.killsMap['<world>'] = 0;
 
     Game.meansOfDeath.map((_mean, i) => this.killsMeansMap[i] = 0);
   }
@@ -64,7 +65,9 @@ class Game {
     let killsByPlayer = {};
 
     for (let playerId in this.killsMap) {
-      killsByPlayer[this.playerMap[playerId]] = this.killsMap[playerId];
+      if (this.playerMap[playerId]) {
+        killsByPlayer[this.playerMap[playerId]] = this.killsMap[playerId];
+      }
     }
 
     return killsByPlayer;

@@ -17,7 +17,7 @@ class LogParser {
   }
 
   static addPlayer(data, parser) {
-    const dataMatch = data.match(/ClientConnect: (\d)/);
+    const dataMatch = data.match(/ClientConnect: (\d+)/);
 
     if (dataMatch) {
       const playerId = dataMatch[1];
@@ -28,7 +28,7 @@ class LogParser {
   }
 
   static changePlayer(data, parser) {
-    const dataMatch = data.match(/ClientUserinfoChanged: (\d) n\\(.*)\\t\\/);
+    const dataMatch = data.match(/ClientUserinfoChanged: (\d+) n\\(.*)\\t\\/);
 
     if (dataMatch) {
       const playerId = dataMatch[1];
@@ -39,7 +39,7 @@ class LogParser {
   }
 
   static addKill(data, parser) {
-    const dataMatch = data.match(/Kill: (\d) (\d) (\d)/);
+    const dataMatch = data.match(/Kill: (\<world\>|\d+) (\d+) (\d+)/);
 
     if (dataMatch) {
       const killerId = dataMatch[1];
@@ -47,7 +47,9 @@ class LogParser {
       const deathMeanId = dataMatch[3];
 
       if (!parser.currentGame.playerMap[killerId]) {
+        parser.currentGame.killsMap[killerId]++;
         parser.currentGame.killsMap[killedId]--;
+        parser.currentGame.killsMeansMap[deathMeanId]++;
       } else if (killerId !== killedId) {
         parser.currentGame.killsMap[killerId]++;
         parser.currentGame.killsMeansMap[deathMeanId]++;
@@ -72,6 +74,8 @@ class LogParser {
   }
 
   parse() {
+    this.games = [];
+
     for (const [i, row] of this.rows.entries()) {
       LogParser.gameParserHandlerMatcher(row, this);
     }
